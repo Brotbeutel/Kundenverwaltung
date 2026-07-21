@@ -23,6 +23,7 @@ Variablennamen gearbeitet, damit Schritt 4 direkt andocken kann.
 
 from functools import wraps
 
+from functools import wraps
 from flask import (
     Blueprint,
     abort,
@@ -31,42 +32,55 @@ from flask import (
     render_template,
     request,
     url_for,
+    current_app
 )
 from flask_login import current_user, login_required, login_user, logout_user
+from flask_mail import Message
 
 from models import Kunde, Mitarbeiter, db
 
+# Wir importieren das Mail-Objekt aus der App, aber lokal innerhalb von Funktionen, um Schleifen zu vermeiden.
 auth_bp = Blueprint("auth", __name__)
 kunden_bp = Blueprint("kunden", __name__)
 
+# ---------------------------------------------------------------------------
+# E-mails: Logik zum Versenden von Willkommens-E-Mails an neue Kunden
+# ---------------------------------------------------------------------------
+def sende_willkommens_mail(kunde):
+    """Sendet automatisch eine E-Mail an einen neuen Kunden."""
+    from app import mail # Lokale Importe verhindern zirkuläre Importe.
+
+    if not kunde.email:
+        return # Wenn keine E-Mail-Adresse angegeben ist, unternehmen wir nichts.
+
+    msg = Message(
+        subject="Willkommen bei der Sportless GmbH!",
+        recipients=[kunde.email],
+        body=f"Hallo {kunde.vorname} {kunde.nachname},\n\n"
+            f"vielen Dank für Ihr Vertrauen! Wir haben Ihre Daten erfolgreich "
+            f"in unserem neuen digitalen System erfasst.\n\n"
+            f"Mit freundlichen Grüßen,\n"
+            f"Das Team der Sportless GmbH"
+    )
+    try:
+        mail.send(msg)
+        flash(f"Willkommens-E-Mail an {kunde.email} wurde versendet.", "info")
+    except Exception as e:
+        # Если почта не отправилась (например, сервер отключен), приложение не должно падать
+        flash(f"E-Mail-Versand fehlgeschlagen: {str(e)}", "warning")
 
 # ---------------------------------------------------------------------------
 # Decorator: Zugriff auf Admin-Rolle beschränken
 # ---------------------------------------------------------------------------
 def admin_erforderlich(view_funktion):
-    """Beschränkt eine Route auf Mitarbeiter mit der Rolle 'admin'.
-
-    Setzt @login_required voraus bzw. prüft zusätzlich, ob überhaupt ein
-    Benutzer angemeldet ist. Nicht-Admins erhalten HTTP 403 Forbidden -
-    das ist die geforderte DSGVO-Absicherung für das harte Löschen von
-    Kundendaten.
-    """
-
     @wraps(view_funktion)
     def eingewickelte_funktion(*args, **kwargs):
         if not current_user.is_authenticated:
-            return login_manager_redirect()
+            return redirect(url_for("auth.login", next=request.path))
         if not current_user.ist_admin:
             abort(403)
         return view_funktion(*args, **kwargs)
-
     return eingewickelte_funktion
-
-
-def login_manager_redirect():
-    """Hilfsfunktion, falls admin_erforderlich ohne vorheriges
-    @login_required auf einer Route landet (defensive Absicherung)."""
-    return redirect(url_for("auth.login", next=request.path))
 
 
 # ---------------------------------------------------------------------------
@@ -74,9 +88,6 @@ def login_manager_redirect():
 # ---------------------------------------------------------------------------
 @auth_bp.route("/login", methods=["GET", "POST"])
 def login():
-    """Meldet einen Mitarbeiter anhand von Benutzername und Passwort an."""
-
-    # Bereits angemeldete Mitarbeiter direkt weiterleiten
     if current_user.is_authenticated:
         return redirect(url_for("kunden.kunden_liste"))
 
@@ -92,16 +103,12 @@ def login():
             return render_template("login.html"), 401
 
         if not mitarbeiter.aktiv:
-            flash(
-                "Dieses Konto wurde deaktiviert. Bitte wenden Sie sich an einen Admin.",
-                "error",
-            )
+            flash("Dieses Konto wurde deaktiviert. Bitte wenden Sie sich an einen Admin.", "error")
             return render_template("login.html"), 403
 
         login_user(mitarbeiter, remember=angemeldet_bleiben)
         flash(f"Willkommen zurück, {mitarbeiter.anzeigename}!", "success")
 
-        # Offene Umleitung vermeiden: nur relative Pfade aus 'next' übernehmen
         ziel = request.args.get("next")
         if ziel and ziel.startswith("/"):
             return redirect(ziel)
@@ -113,7 +120,6 @@ def login():
 @auth_bp.route("/logout")
 @login_required
 def logout():
-    """Beendet die aktuelle Sitzung sicher."""
     logout_user()
     flash("Sie wurden abgemeldet.", "info")
     return redirect(url_for("auth.login"))
@@ -125,10 +131,9 @@ def logout():
 @kunden_bp.route("/kunden")
 @login_required
 def kunden_liste():
-    """Zeigt alle Kunden an, optional gefiltert über den Query-Parameter 'q'."""
     suchbegriff = request.args.get("q", "").strip()
-
     abfrage = Kunde.query
+
     if suchbegriff:
         muster = f"%{suchbegriff}%"
         abfrage = abfrage.filter(
@@ -145,12 +150,7 @@ def kunden_liste():
 
 
 def _kundendaten_aus_formular(kunde: Kunde) -> list[str]:
-    """Überträgt Formulardaten aus request.form in ein Kunde-Objekt.
-
-    Gibt eine Liste von Validierungsfehlern zurück (leer = alles ok).
-    """
     fehler = []
-
     vorname = request.form.get("vorname", "").strip()
     nachname = request.form.get("nachname", "").strip()
 
@@ -175,12 +175,6 @@ def _kundendaten_aus_formular(kunde: Kunde) -> list[str]:
 @kunden_bp.route("/kunde/neu", methods=["GET", "POST"])
 @login_required
 def kunde_neu():
-    """Erstellt einen neuen Kundendatensatz.
-
-    Die ID des anlegenden Mitarbeiters wird automatisch aus der laufenden
-    Sitzung (current_user) übernommen - kann vom Formular nicht überschrieben
-    werden.
-    """
     kunde = Kunde()
 
     if request.method == "POST":
@@ -195,6 +189,9 @@ def kunde_neu():
         db.session.add(kunde)
         db.session.commit()
 
+        # ТРИГГЕР ОТПРАВКИ ПИСЬМА:
+        sende_willkommens_mail(kunde)
+
         flash(f"Kunde '{kunde.vollstaendiger_name}' wurde angelegt.", "success")
         return redirect(url_for("kunden.kunden_liste"))
 
@@ -204,8 +201,6 @@ def kunde_neu():
 @kunden_bp.route("/kunde/<int:id>/bearbeiten", methods=["GET", "POST"])
 @login_required
 def kunde_bearbeiten(id: int):
-    """Bearbeitet einen bestehenden Kunden. Für alle angemeldeten
-    Mitarbeiter zugänglich (kein admin_erforderlich)."""
     kunde = db.session.get(Kunde, id)
     if kunde is None:
         abort(404)
@@ -229,13 +224,6 @@ def kunde_bearbeiten(id: int):
 @login_required
 @admin_erforderlich
 def kunde_loeschen(id: int):
-    """Löscht einen Kundendatensatz endgültig (hartes Löschen).
-
-    DSGVO-Vorgabe: Ausschließlich Mitarbeiter mit der Rolle 'admin' dürfen
-    diese Route aufrufen. Der admin_erforderlich-Decorator sorgt dafür,
-    dass normale Mitarbeiter mit HTTP 403 Forbidden abgewiesen werden,
-    bevor diese Funktion überhaupt ausgeführt wird.
-    """
     kunde = db.session.get(Kunde, id)
     if kunde is None:
         abort(404)

@@ -25,6 +25,24 @@ class Config:
 
     SQLALCHEMY_DATABASE_URI = _db_url or "sqlite:///" + os.path.join(BASISVERZEICHNIS, "kundenverwaltung.db")
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+    PERMANENT_SESSION_LIFETIME = timedelta(minutes=30)
+    REMEMBER_COOKIE_DURATION = timedelta(days=7)
+
+
+    # --- E-Mail (Flask-Mail) ---
+    MAIL_SERVER = os.environ.get("MAIL_SERVER", "127.0.0.1") # Локальный сервер по умолчанию
+    _mail_port_env = os.environ.get("MAIL_PORT")
+    MAIL_PORT = int(_mail_port_env) if _mail_port_env else 1025 # Порт нашей заглушки
+
+    # Для локальной заглушки TLS НЕ нужен. Если Mailtrap — ставьте True
+    MAIL_USE_TLS = os.environ.get("MAIL_USE_TLS", "False").lower() in ("true", "1")
+    MAIL_USERNAME = os.environ.get("MAIL_USERNAME", "")
+    MAIL_PASSWORD = os.environ.get("MAIL_PASSWORD", "")
+    MAIL_DEFAULT_SENDER = os.environ.get("MAIL_DEFAULT_SENDER", "kundenverwaltung@sportless-gmbh.de")
+
+    # WICHTIG: Wir setzen dies auf „False“, damit E-Mails WIRKLICH an unseren Stub gesendet werden.
+    MAIL_SUPPRESS_SEND = os.environ.get("MAIL_SUPPRESS_SEND", "False").lower() in ("true", "1")
+
 
     # --- Login / Session ---
     PERMANENT_SESSION_LIFETIME = timedelta(minutes=30)
