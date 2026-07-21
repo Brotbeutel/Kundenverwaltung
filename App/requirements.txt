@@ -4,3 +4,4 @@ Flask-Login==0.6.3
 Flask-Mail==0.9.1
 Werkzeug==3.0.3
 python-dotenv==1.0.1
+Flask-WTF==1.2.1

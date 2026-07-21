@@ -15,6 +15,7 @@ import os
 from flask import Flask
 from flask_login import LoginManager
 from flask_mail import Mail
+from flask_wtf import CSRFProtect
 from dotenv import load_dotenv
 from sqlalchemy import event
 from sqlalchemy.engine import Engine
@@ -27,6 +28,10 @@ from models import db, Mitarbeiter
 # --- Extensions (noch ohne App-Bindung, siehe erstelle_app()) ---
 login_manager = LoginManager()
 mail = Mail()
+# Schützt alle POST-Formulare (Login, Kunde anlegen/bearbeiten/löschen) vor
+# Cross-Site-Request-Forgery. Jedes <form> in den Templates braucht dafür
+# das versteckte Feld {{ csrf_token() }} (siehe templates/*.html).
+csrf = CSRFProtect()
 
 
 @event.listens_for(Engine, "connect")
@@ -57,9 +62,10 @@ def erstelle_app() -> Flask:
     # --- Extensions an die App binden ---
     db.init_app(app)
     mail.init_app(app)
+    csrf.init_app(app)
 
     login_manager.init_app(app)
-    login_manager.login_view = "auth.login"
+    login_manager.login_view = "auth.login"  # type: ignore
     login_manager.login_message = "Bitte melden Sie sich an, um fortzufahren."
     login_manager.login_message_category = "info"
 
