@@ -70,6 +70,60 @@ def login_manager_redirect():
 
 
 # ---------------------------------------------------------------------------
+# Auth-Blueprint: Startseite
+# ---------------------------------------------------------------------------
+@auth_bp.route("/")
+def startseite():
+    """Zeigt die Willkommensseite der Anwendung an."""
+    from flask_login import current_user
+    if current_user.is_authenticated:
+        return redirect(url_for("kunden.kunden_liste"))
+    return render_template("index.html")
+
+
+# routes.py
+
+@auth_bp.route("/registrierung", methods=["POST"])
+def selbst_registrierung():
+    """Ermöglicht Kunden, sich selbst von der Startseite aus zu registrieren."""
+    # Создаем новый пустой объект клиента
+    kunde = Kunde()
+
+    # Собираем данные из формы
+    fehler = _kundendaten_aus_formular(kunde)
+
+    if fehler:
+        for meldung in fehler:
+            flash(meldung, "error")
+        return redirect(url_for("auth.startseite"))
+
+    # Так как клиент регистрируется сам, поле сотрудника остается пустым (None)
+    kunde.angelegt_von_id = None
+
+    db.session.add(kunde)
+    db.session.commit()
+
+    # Отправляем e-mail с благодарностью за регистрацию!
+    if kunde.email:
+        from app import mail
+        msg = Message(
+            subject="Vielen Dank für Ihre Registrierung bei Sportless!",
+            recipients=[kunde.email],
+            body=f"Hallo {kunde.vorname} {kunde.nachname},\n\n"
+                 f"vielen Dank für Ihre Registrierung in der Sportless GmbH Fitnessstudio!\n"
+                 f"Wir freuen uns darauf, Sie bei Ihrem Training zu unterstützen.\n\n"
+                 f"Mit sportlichen Grüßen,\n"
+                 f"Ihr Sportless Team"
+        )
+        try:
+            mail.send(msg)
+            flash("Registrierung erfolgreich! Eine Bestätigung wurde an Ihre E-Mail gesendet.", "success")
+        except Exception as e:
+            flash("Registrierung erfolgreich, aber die Bestätigung konnte nicht gesendet werden.", "warning")
+
+    return redirect(url_for("auth.startseite"))
+
+# ---------------------------------------------------------------------------
 # Auth-Blueprint: Login / Logout
 # ---------------------------------------------------------------------------
 @auth_bp.route("/login", methods=["GET", "POST"])

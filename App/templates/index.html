@@ -1,0 +1,104 @@
+<!-- templates/index.html -->
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Willkommen bei Sportless CRM</title>
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+</head>
+
+<body class="bg-stone-900 text-white min-h-screen flex flex-col justify-between">
+
+  <!-- Hero Section (макет с фоном) -->
+  <div class="relative flex-grow flex flex-col items-center justify-center bg-cover bg-center px-4 py-20"
+    style="background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('https://images.unsplash.com/photo-1517838277536-f5f99be501cd?q=80&w=1000');">
+
+
+    <!-- ВЕРХНИЕ КНОПКИ НАВИГАЦИИ -->
+    <div class="absolute top-6 right-6 flex flex-col gap-2">
+      <!-- Добавили onclick для открытия окна -->
+      <button onclick="toggleModal(true)"
+        class="bg-stone-400/80 hover:bg-stone-400 text-stone-900 px-6 py-1.5 rounded-full text-sm font-semibold transition cursor-pointer">
+        Registrieren
+      </button>
+      <a href="{{ url_for('auth.login') }}"
+        class="bg-stone-400/80 hover:bg-stone-400 text-stone-900 px-6 py-1.5 rounded-full text-sm font-semibold text-center transition">
+        Anmelden
+      </a>
+    </div>
+
+    <!-- ВСПЛЫВАЮЩЕЕ ОКНО (MODAL) РЕГИСТРАЦИИ КЛИЕНТА -->
+    <div id="registerModal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center p-4 z-50">
+      <div class="bg-stone-800 text-white p-6 rounded-2xl w-full max-w-md border border-stone-700 relative">
+
+        <!-- Кнопка закрытия (Крестик) -->
+        <button onclick="toggleModal(false)"
+          class="absolute top-4 right-4 text-stone-400 hover:text-white text-xl font-bold cursor-pointer">&times;</button>
+
+        <h2 class="text-2xl font-serif italic mb-4 text-stone-200">Kundenregistrierung</h2>
+
+        <!-- Форма отправляет данные на новый публичный роут -->
+        <form action="{{ url_for('auth.selbst_registrierung') }}" method="POST" class="space-y-3">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+          <div>
+            <label class="block text-xs uppercase tracking-wider text-stone-400 mb-1">Vorname *</label>
+            <input type="text" name="vorname" required
+              class="w-full bg-stone-900 border border-stone-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-stone-400">
+          </div>
+
+          <div>
+            <label class="block text-xs uppercase tracking-wider text-stone-400 mb-1">Nachname *</label>
+            <input type="text" name="nachname" required
+              class="w-full bg-stone-900 border border-stone-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-stone-400">
+          </div>
+
+          <div>
+            <label class="block text-xs uppercase tracking-wider text-stone-400 mb-1">E-Mail-Adresse</label>
+            <input type="email" name="email"
+              class="w-full bg-stone-900 border border-stone-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-stone-400">
+          </div>
+
+          <div>
+            <label class="block text-xs uppercase tracking-wider text-stone-400 mb-1">Firma</label>
+            <input type="text" name="firma"
+              class="w-full bg-stone-900 border border-stone-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-stone-400">
+          </div>
+
+          <button type="submit"
+            class="w-full bg-stone-400 hover:bg-stone-300 text-stone-900 font-semibold py-2 rounded-xl transition mt-4 cursor-pointer">
+            Jetzt registrieren
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- МАЛЕНЬКИЙ СКРИПТ ДЛЯ ОТКРЫТИЯ/ЗАКРЫТИЯ ОКНА -->
+    <script>
+      function toggleModal(show) {
+        const modal = document.getElementById('registerModal');
+        if (show) {
+          modal.classList.remove('hidden');
+        } else {
+          modal.classList.add('hidden');
+        }
+      }
+    </script>
+
+    <!-- Центральный заголовок -->
+    <div class="text-center tracking-widest mt-10">
+      <p class="text-xl uppercase font-light tracking-widest mb-4">Willkommen bei</p>
+      <h1 class="text-6xl md:text-8xl font-serif italic mb-2 text-stone-200">Sportless CRM</h1>
+      <p class="text-xl font-mono tracking-widest text-stone-300">FITNESSSTUDIO</p>
+    </div>
+  </div>
+
+  <!-- Нижний блок (Подвал) -->
+  <footer class="bg-amber-900/40 py-4 text-center text-xs text-stone-400 border-t border-amber-900/20">
+    &copy; 2026 Sportless GmbH. Alle Rechte vorbehalten.
+  </footer>
+
+</body>
+
+</html>
