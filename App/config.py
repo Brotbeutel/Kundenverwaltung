@@ -31,17 +31,14 @@ class Config:
     REMEMBER_COOKIE_DURATION = timedelta(days=7)
 
     # --- E-Mail (Flask-Mail) ---
-    MAIL_SERVER = os.environ.get("MAIL_SERVER", "smtp.mailtrap.io")
+    MAIL_SERVER = "127.0.0.1"
+    MAIL_PORT = 1025
+    MAIL_USE_TLS = False
+    MAIL_USERNAME = ""
+    MAIL_PASSWORD = ""
+    MAIL_DEFAULT_SENDER = "kundenverwaltung@sportless-gmbh.de"
 
-    _mail_port_env = os.environ.get("MAIL_PORT")
-    MAIL_PORT = int(_mail_port_env) if _mail_port_env else 2525
-
-    MAIL_USE_TLS = os.environ.get("MAIL_USE_TLS", "True").lower() in ("true", "1")
-    MAIL_USERNAME = os.environ.get("MAIL_USERNAME", "")
-    MAIL_PASSWORD = os.environ.get("MAIL_PASSWORD", "")
-    MAIL_DEFAULT_SENDER = os.environ.get("MAIL_DEFAULT_SENDER", "kundenverwaltung@sportless-gmbh.de")
-
-    MAIL_SUPPRESS_SEND = os.environ.get("MAIL_SUPPRESS_SEND", "True").lower() in ("true", "1")
+    MAIL_SUPPRESS_SEND = False
 
 
 class EntwicklungConfig(Config):

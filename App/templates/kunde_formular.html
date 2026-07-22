@@ -4,7 +4,8 @@
 {% block inhalt %}
 <div class="max-w-2xl mx-auto px-5 sm:px-8 py-8">
 
-  <a href="{{ url_for('kunden.kunden_liste') }}" class="inline-flex items-center gap-1.5 text-sm text-inkmuted hover:text-ink transition-colors mb-6 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent rounded">
+  <a href="{{ url_for('kunden.kunden_liste') }}"
+    class="inline-flex items-center gap-1.5 text-sm text-inkmuted hover:text-ink transition-colors mb-6 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent rounded">
     <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
       <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
     </svg>
@@ -22,9 +23,10 @@
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
     <!-- Person -->
+    <!-- Person -->
     <fieldset>
       <legend class="text-xs font-mono uppercase tracking-wider text-inkmuted mb-3">Person</legend>
-      <div class="grid sm:grid-cols-2 gap-4">
+      <div class="grid sm:grid-cols-2 md:grid-cols-3 gap-4">
         <div>
           <label for="vorname" class="block text-sm font-medium mb-1.5">Vorname *</label>
           <input type="text" id="vorname" name="vorname" required value="{{ kunde.vorname or '' }}"
@@ -33,6 +35,13 @@
         <div>
           <label for="nachname" class="block text-sm font-medium mb-1.5">Nachname *</label>
           <input type="text" id="nachname" name="nachname" required value="{{ kunde.nachname or '' }}"
+            class="w-full border border-line rounded-lg px-3.5 py-2.5 text-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus:border-accent transition-colors">
+        </div>
+        <!-- Новое поле: Geburtsdatum -->
+        <div>
+          <label for="geburtsdatum" class="block text-sm font-medium mb-1.5">Geburtsdatum</label>
+          <input type="date" id="geburtsdatum" name="geburtsdatum"
+            value="{{ kunde.geburtsdatum.strftime('%Y-%m-%d') if kunde.geburtsdatum else '' }}"
             class="w-full border border-line rounded-lg px-3.5 py-2.5 text-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus:border-accent transition-colors">
         </div>
       </div>
@@ -92,8 +101,7 @@
     <!-- Notizen -->
     <fieldset>
       <legend class="text-xs font-mono uppercase tracking-wider text-inkmuted mb-3">Notizen</legend>
-      <textarea id="notizen" name="notizen" rows="4"
-        placeholder="Individuelle Vermerke zu diesem Kunden …"
+      <textarea id="notizen" name="notizen" rows="4" placeholder="Individuelle Vermerke zu diesem Kunden …"
         class="w-full border border-line rounded-lg px-3.5 py-2.5 text-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus:border-accent transition-colors resize-y">{{ kunde.notizen or '' }}</textarea>
     </fieldset>
 
@@ -103,7 +111,7 @@
         {{ "Kunde anlegen" if modus == "neu" else "Änderungen speichern" }}
       </button>
       <a href="{{ url_for('kunden.kunden_liste') }}"
-         class="text-sm text-inkmuted hover:text-ink transition-colors px-3 py-2.5">
+        class="text-sm text-inkmuted hover:text-ink transition-colors px-3 py-2.5">
         Abbrechen
       </a>
     </div>

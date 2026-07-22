@@ -73,6 +73,7 @@ class Kunde(db.Model):
 
     vorname = db.Column(db.String(100), nullable=False)
     nachname = db.Column(db.String(100), nullable=False)
+    geburtsdatum = db.Column(db.Date, nullable=True)
     firma = db.Column(db.String(150), nullable=True)
 
     strasse = db.Column(db.String(150), nullable=True)

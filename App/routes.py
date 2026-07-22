@@ -20,6 +20,11 @@ Die HTML-Templates (login.html, kunden_liste.html, kunde_formular.html)
 folgen in Schritt 4 - hier wird bereits mit den finalen Template- und
 Variablennamen gearbeitet, damit Schritt 4 direkt andocken kann.
 """
+from datetime import datetime
+from datetime import date, timedelta
+import random
+
+from flask_mail import Mail, Message
 
 from functools import wraps
 
@@ -164,7 +169,7 @@ def login():
     return render_template("login.html")
 
 
-@auth_bp.route("/logout")
+@auth_bp.route("/logout", methods=["GET", "POST"])
 @login_required
 def logout():
     """Beendet die aktuelle Sitzung sicher."""
@@ -222,6 +227,17 @@ def _kundendaten_aus_formular(kunde: Kunde) -> list[str]:
     kunde.email = request.form.get("email", "").strip() or None
     kunde.telefon = request.form.get("telefon", "").strip() or None
     kunde.notizen = request.form.get("notizen", "").strip() or None
+
+    # Data lesen aus POST
+    geburtsdatum_str = request.form.get("geburtsdatum", "").strip()
+    if geburtsdatum_str:
+        try:
+            # Превращаем строку "YYYY-MM-DD" в объект date для SQLAlchemy
+            kunde.geburtsdatum = datetime.strptime(geburtsdatum_str, "%Y-%m-%d").date()
+        except ValueError:
+            fehler.append("Das Geburtsdatum hat ein ungültiges Format.")
+    else:
+        kunde.geburtsdatum = None
 
     return fehler
 
@@ -299,4 +315,78 @@ def kunde_loeschen(id: int):
     db.session.commit()
 
     flash(f"Kunde '{name}' wurde gemäß DSGVO endgültig gelöscht.", "success")
+    return redirect(url_for("kunden.kunden_liste"))
+
+
+# routes.py
+from datetime import date, timedelta
+import random
+
+@kunden_bp.route("/kunden/geburtstag-test")
+@login_required
+def geburtstag_simulation():
+    """Simuliert die automatische Überprüfung und den Versand von Geburtstags-Mails."""
+    from app import mail
+    from flask_mail import Message
+
+    heute = date.today()
+    # ВРЕМЕННЫЙ ПРИНТ ДЛЯ ПРОВЕРКИ В ТЕРМИНАЛЕ:
+    print(f"=== SIMULATION START: SUTCHDATUM IST {heute.day}.{heute.month} ===")
+
+    alle_kunden = Kunde.query.all()
+    geburtstagskinder = []
+
+    for kunde in alle_kunden:
+        # Тоже выведем в консоль всех, кого проверяем
+        print(f"Prüfe Kunde: {kunde.vollstaendiger_name}, Geburtstag im System: {kunde.geburtsdatum}")
+        if kunde.geburtsdatum and kunde.geburtsdatum.day == heute.day and kunde.geburtsdatum.month == heute.month:
+            geburtstagskinder.append(kunde)
+
+    print(f"Gefundene Geburtstagskinder: {len(geburtstagskinder)}")
+
+    if not geburtstagskinder:
+        flash("Heute hat kein Kunde Geburtstag. Legen Sie im System einen Test-Kunden mit dem heutigen Datum an!", "info")
+        return redirect(url_for("kunden.kunden_liste"))
+
+    # 3. Schleife für den Mail-Versand an alle Geburtstagskinder
+    gesendete_mails = 0
+    for kind in geburtstagskinder:
+        if not kind.email:
+            continue
+
+        # Dynamische Daten für den Gutschein vorbereiten
+        betrag = random.choice([10, 15, 20])  # Zufälliger Betrag
+        code = random.randint(1000, 9999)     # Zufälliger Code-Zusatz
+        gueltig_bis = (heute + timedelta(days=30)).strftime("%d.%m.%Y") # 30 Tage gültig
+
+        # Dein Text aus der Aufgabe:
+        mail_text = (
+            f"Liebe/r {kind.vorname},\n\n"
+            f"zu Ihrem Geburtstag gratuliert Ihnen das gesamte Team von Sportless GmbH ganz herzlich "
+            f"und wünscht Ihnen Gesundheit, Glück und viele sportliche Erfolge im neuen Lebensjahr!\n\n"
+            f"Als kleines Geburtstagsgeschenk möchten wir uns für Ihr Vertrauen bedanken. Deshalb erhalten "
+            f"Sie von uns einen Gutschein im Wert von {betrag} €, den Sie für unsere Angebote und Leistungen nutzen können.\n\n"
+            f"Ihr Gutscheincode:\n"
+            f"GEBURTSTAG-{code}\n\n"
+            f"Der Gutschein ist bis zum {gueltig_bis} gültig.\n\n"
+            f"Wir freuen uns darauf, Sie auch weiterhin auf Ihrem sportlichen Weg begleiten zu dürfen "
+            f"und wünschen Ihnen einen wunderschönen Geburtstag!\n\n"
+            f"Mit freundlichen Grüßen\n"
+            f"Ihr Sportless-Team"
+        )
+
+        msg = Message(
+            subject="Herzlichen Glückwunsch zum Geburtstag!",
+            recipients=[kind.email],
+            body=mail_text
+        )
+
+        try:
+            mail.send(msg)
+            gesendete_mails += 1
+        except Exception as e:
+            flash(f"Fehler beim Senden an {kind.email}: {str(e)}", "error")
+
+    if gesendete_mails > 0:
+        flash(f"Erfolg! {gesendete_mails} Geburtstags-Mail(s) wurden erfolgreich simuliert und versendet.", "success")
     return redirect(url_for("kunden.kunden_liste"))
