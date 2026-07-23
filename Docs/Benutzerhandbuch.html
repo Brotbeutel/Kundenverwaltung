@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Benutzerhandbuch – Digitale Kundenverwaltung</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet">
+
+  <style>
+    :root {
+      --chalk: #412b27;
+      --pitchlight: #F3ECE3;
+
+      --ink: #211614;
+      --inkmuted: #372E19;
+
+      --line: #93631F;
+
+      --accent: #B33400;
+      --accentdark: #663D27;
+
+      --pitch: #2A1C19;
+
+      --danger: #a95339;
+      --dangerlight: #e5c2b7;
+
+      --radius: 1 px;
+    }
+
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+
+      font-family: Inter, sans-serif;
+      background: var(--chalk);
+      color: var(--ink);
+      line-height: 1.8;
+    }
+
+    .container {
+
+      width: min(1100px, 92%);
+      margin: auto;
+      padding: 60px 0 80px;
+    }
+
+    .hero {
+
+      background: #c6bfb9;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 60px;
+      margin-bottom: 40px;
+
+      box-shadow:
+        0 15px 40px rgba(0, 0, 0, .04);
+    }
+
+    .hero h1 {
+
+      font-size: 3rem;
+      margin-bottom: 18px;
+    }
+
+    .hero p {
+
+      font-size: 1.2rem;
+      color: var(--inkmuted);
+    }
+
+    .section {
+
+      background: #F4EBE7;
+      border: 1px solid var(--line);
+      border-radius: 5px;
+      padding: 45px;
+      margin-bottom: 35px;
+
+      box-shadow:
+        0 8px 20px rgba(0, 0, 0, .03);
+    }
+
+    .section h2 {
+
+      color: var(--accent);
+      margin-bottom: 25px;
+      font-size: 2rem;
+
+      display: flex;
+      gap: 15px;
+      align-items: center;
+    }
+
+    .section h3 {
+
+      margin-top: 30px;
+      margin-bottom: 18px;
+      color: var(--pitch);
+      font-size: 1.3rem;
+    }
+
+    ol {
+
+      padding-left: 25px;
+    }
+
+    ul {
+
+      padding-left: 25px;
+    }
+
+    li {
+
+      margin-bottom: 14px;
+    }
+
+    .notice {
+
+      margin-top: 28px;
+
+      background: var(--dangerlight);
+
+      border-left: 6px solid var(--danger);
+
+      padding: 22px;
+      border-radius: 14px;
+    }
+
+    .notice strong {
+
+      color: var(--danger);
+    }
+
+    .success {
+
+      background: var(--pitchlight);
+
+      border-left: 6px solid var(--pitch);
+
+      padding: 22px;
+
+      border-radius: 14px;
+
+      margin-top: 22px;
+    }
+
+    .divider {
+
+      height: 1px;
+      background: var(--line);
+      margin: 35px 0;
+    }
+
+    .card {
+
+      background: #fafafaa3;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 28px;
+      margin-top: 20px;
+    }
+
+    .footer {
+
+      text-align: center;
+      color: var(--pitchlight);
+      margin-top: 60px;
+      font-size: .95rem;
+    }
+
+    @media(max-width:800px) {
+
+      .hero {
+
+        padding: 35px;
+      }
+
+      .section {
+
+        padding: 30px;
+      }
+
+      .hero h1 {
+
+        font-size: 2.2rem;
+      }
+
+      .section h2 {
+
+        font-size: 1.6rem;
+      }
+
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="container">
+
+    <div class="hero">
+
+      <h1>Benutzerhandbuch</h1>
+
+      <p><strong>Digitale Kundenverwaltung (Sportless GmbH)</strong></p>
+
+      <br>
+
+      <p>
+        Herzlich willkommen zu Ihrer neuen digitalen Kundenverwaltung! Ab sofort gehört der lästige Zettelkram der
+        Vergangenheit an. Dieses Handbuch führt Sie Schritt für Schritt durch das System. Alles ist einfach aufgebaut
+        und leicht zu bedienen.
+      </p>
+
+    </div>
+
+    <section class="section">
+
+      <h2>1. Erste Schritte: Wie logge ich mich ein?</h2>
+
+      <p>
+        Um mit dem System zu arbeiten, müssen Sie sich zuerst an Ihrem Computer oder Tablet anmelden. Das schützt die
+        sensiblen Daten unserer Kunden.
+      </p>
+
+      <div class="card">
+
+        <h3>Schritt-für-Schritt-Anleitung:</h3>
+
+        <ol>
+
+          <li>Öffnen Sie das Programm an Ihrem Arbeitsplatz.</li>
+
+          <li>Es erscheint die Anmeldeseite mit dem Hinweis: "Bitte melden Sie sich an, um fortzufahren."</li>
+
+          <li>Geben Sie Ihren persönlichen Benutzernamen und Ihr Passwort in die dafür vorgesehenen Felder ein.</li>
+
+          <li>Klicken Sie auf den Button "Anmelden".</li>
+
+        </ol>
+
+      </div>
+
+      <div class="notice">
+
+        <strong>⚠️ Wichtiger Sicherheitshinweis:</strong>
+
+        <p style="margin-top:10px;">
+          Wenn Sie Ihren Arbeitsplatz verlassen, schließt sich Ihre Sitzung nach 30 Minuten Inaktivität automatisch ab.
+          Sie müssen sich dann aus Sicherheitsgründen neu anmelden.
+        </p>
+
+      </div>
+
+    </section>
+
+    <section class="section">
+
+      <h2>2. Kundenverwaltung</h2>
+
+      <p>
+        Hier erledigen Sie Ihre tägliche Arbeit. Sie können Kunden finden, neue Kontakte eintragen oder veraltete Daten
+        korrigieren.
+      </p>
+
+      <div class="divider"></div>
+
+      <h3>Einen neuen Kunden anlegen:</h3>
+
+      <div class="card">
+
+        <ol>
+
+          <li>Klicken Sie in der Menüleiste auf den Punkt "Neuen Kunden anlegen".</li>
+
+          <li>
+            Es öffnet sich ein digitales Formular. Tragen Sie dort die Daten ein:
+            <ul>
+              <li>Vorname und Nachname</li>
+              <li>Firma (falls vorhanden)</li>
+              <li>Anschrift (Straße, Hausnummer, PLZ, Ort)</li>
+              <li>E-Mail-Adresse</li>
+            </ul>
+          </li>
+
+          <li>Überprüfen Sie Ihre Eingaben und klicken Sie auf "Speichern". Der Kunde ist nun sofort im System
+            hinterlegt.</li>
+
+        </ol>
+
+      </div>
+
+      <h3>Kunden suchen und Daten bearbeiten:</h3>
+
+      <div class="card">
+
+        <ol>
+
+          <li>Nutzen Sie das Suchfeld auf Ihrer Startseite, um nach dem Namen des Kunden oder der Firma zu suchen.</li>
+
+          <li>Klicken Sie auf den Namen des Kunden, um seine digitale Kundenkarte anzuzeigen.</li>
+
+          <li>Wenn sich eine Adresse oder eine Telefonnummer geändert hat, klicken Sie auf "Bearbeiten".</li>
+
+          <li>Ändern Sie die gewünschten Daten ab und klicken Sie am Ende auf "Änderungen speichern".</li>
+
+        </ol>
+
+      </div>
+
+    </section>
+
+    <section class="section">
+
+      <h2>3. Wichtiger Hinweis zum Löschen von Kunden (DSGVO)</h2>
+
+      <p>
+        Der Schutz von Kundendaten ist gesetzlich streng geregelt (Datenschutz-Grundverordnung, kurz: DSGVO). Daher ist
+        das System so eingestellt, dass normale Mitarbeiter keine Kunden löschen können.
+      </p>
+
+      <div class="notice">
+
+        <ul>
+
+          <li><strong>Wer darf löschen?</strong> Nur der Administrator besitzt die Rechte, Daten endgültig aus dem
+            System zu entfernen.</li>
+
+          <li><strong>Was müssen Sie tun?</strong> Wenn ein Kunde gelöscht werden möchte (z. B. weil er kein Interesse
+            mehr an Angeboten hat), wenden Sie sich bitte direkt an die Geschäftsleitung oder Ihren IT-Administrator.
+            Dieser wird die Löschung sicher und gesetzeskonform für Sie durchführen.</li>
+
+        </ul>
+
+      </div>
+
+    </section>
+
+    <section class="section">
+
+      <h2>4. Automatisierter E-Mail-Versand</h2>
+
+      <p>
+        Das System kann automatisch E-Mails an Ihre Kunden senden (z. B. Bestätigungen oder wichtige Informationen). Sie
+        müssen dafür kein separates E-Mail-Programm öffnen.
+      </p>
+
+      <div class="success">
+
+        <h3>Wie funktioniert das?</h3>
+
+        <ul>
+
+          <li>Das System versendet die Nachrichten im Hintergrund im Namen der Adresse:
+            kundenverwaltung@sportless-gmbh.de.</li>
+
+          <li>Sobald Sie im System eine Aktion auslösen, die eine E-Mail erfordert (z. B. nach dem Anlegen eines Termins
+            oder dem Absenden eines Formulars), generiert die Software die Nachricht ganz von allein.</li>
+
+          <li>Ihr Vorteil: Sie müssen keine Adressen mehr abtippen oder Texte kopieren – das System erledigt das
+            fehlerfrei für Sie.</li>
+
+        </ul>
+
+      </div>
+
+    </section>
+
+    <div class="footer">
+      Sportless GmbH • Digitale Kundenverwaltung
+    </div>
+
+  </div>
+
+</body>
+
+</html>
