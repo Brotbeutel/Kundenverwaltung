@@ -1,82 +1,94 @@
 # Kundenverwaltungssystem – Sportless GmbH
 
-Digitale Verwaltung von Kundendaten für die Sportless GmbH als Ablösung der bisherigen papierbasierten Kundenlisten. Ergänzt das bereits bestehende Kalender-Tool der Abteilung.
+Webbasierte Kundenverwaltungsanwendung für Sportless GmbH mit Mitarbeiter-Login, Rollenverwaltung und DSGVO-konformer Löschfunktion.
 
-## Projektbeschreibung
+## Projektübersicht
 
-Aktuell werden Kundeninformationen handschriftlich in Blöcken und Büchern erfasst. Dieses Projekt digitalisiert die Kundenverwaltung und bietet zusätzlich die Möglichkeit, automatisierte E-Mails an Kunden zu versenden.
+Diese Anwendung digitalisiert papierbasierte Kundenlisten und bietet einen zentralen Punkt für:
 
-## Funktionen
-
-- **Kundenverwaltung**: Anlegen, Anzeigen und Bearbeiten von Kundendatensätzen (Name, Vorname, Firma, Anschrift u. a.)
-- **Login-System**: Authentifizierung für Mitarbeiter*innen
-- **Rollenkonzept**:
-  - *Mitarbeiter*: Kundendaten anlegen und bearbeiten
-  - *Admin*: zusätzlich berechtigt, Kundendaten DSGVO-konform zu löschen
-- **Automatisierter E-Mail-Versand**: E-Mails werden mit Kontaktdaten aus der Datenbank automatisch befüllt und verschickt
+- Kunden anlegen, anzeigen, bearbeiten und löschen
+- Mitarbeiter-Authentifizierung mit Admin- und Mitarbeiterrolle
+- Kundenregistrierung über die Startseite
+- optionalen E-Mail-Versand über SMTP
 
 ## Technologie-Stack
 
-> Platzhalter – bitte an das tatsächlich gewählte Setup anpassen.
+- Python 3.10+
+- Flask
+- Flask-SQLAlchemy
+- Flask-Login
+- Flask-WTF
+- Flask-Mail
+- SQLite standardmäßig, optional konfigurierbar über `DATABASE_URL`
+- `python-dotenv` zur lokalen `.env`-Konfiguration
 
-- **Datenbank**: SQL (z. B. MySQL/PostgreSQL)
-- **Backend**: _TBD_
-- **Frontend**: _TBD_
-- **E-Mail-Versand**: SMTP über kostenlosen Anbieter mit Freikontingent (z. B. Brevo)
+## Verfügbare Seiten und Routen
 
-## Installation
+- `/` – Startseite. Leitet angemeldete Nutzer zur Kundenliste weiter.
+- `/login` – Mitarbeiter-Login
+- `/logout` – Abmelden
+- `/registrierung` – Kunden-Selbstregistrierung (POST)
+- `/kunden` – Kundenliste und Suche
+- `/kunde/neu` – Neues Kundenformular
+- `/kunde/<id>/bearbeiten` – Kundenbearbeitung
+- `/kunde/<id>/loeschen` – Endgültiges Löschen eines Kunden (POST, nur Admin)
 
-```bash
-# Repository klonen
-git clone <repo-url>
-cd <projektordner>
+## Lokale Einrichtung
 
-# Abhängigkeiten installieren
-_TBD_
+Die Hauptanwendung befindet sich in `App/`. Ein Einstieg ist in `App/installation_guide.md` dokumentiert.
 
-# Datenbank einrichten
-_TBD_
+### Kurzer Start
 
-# Umgebungsvariablen konfigurieren (siehe .env.example)
-_TBD_
-
-# Anwendung starten
-_TBD_
+```powershell
+cd C:\GitHub\Kundenverwaltung\App
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+python -m pip install --upgrade pip
+python -m pip install -r requirements.txt
+copy .env.example .env
+python init_db.py
+python app.py
 ```
+
+Öffne dann `http://127.0.0.1:5000` im Browser.
+
+## Standardkonten
+
+`init_db.py` legt diese Benutzer an, falls sie noch nicht existieren:
+
+- Admin: `admin` / `aendere-mich-admin123`
+- Mitarbeiter: `mitarbeiter` / `aendere-mich-mit123`
 
 ## Konfiguration
 
-Folgende Umgebungsvariablen werden benötigt (Beispiel):
+Die Anwendung lädt Umgebungsvariablen aus einer `.env`-Datei im `App/`-Verzeichnis. Beispielwerte findest du in `App/.env.example`.
 
-```
-DB_HOST=
-DB_USER=
-DB_PASSWORD=
-DB_NAME=
-SMTP_HOST=
-SMTP_PORT=
-SMTP_USER=
-SMTP_PASSWORD=
-```
+Für Mail-Parameter wie `MAIL_SERVER`, `MAIL_PORT`, `MAIL_USE_TLS`, `MAIL_USERNAME`, `MAIL_PASSWORD`, `MAIL_DEFAULT_SENDER` und `MAIL_SUPPRESS_SEND` wird `App/config.py` verwendet. Standardmäßig ist ein lokaler SMTP-Testserver auf `127.0.0.1:1025` konfiguriert.
 
-## Berechtigungen & DSGVO
+## Lokaler Mail-Test
 
-- Nur Nutzer mit der Rolle **Admin** dürfen Kundendaten löschen.
-- Vor dem produktiven Einsatz des E-Mail-Versands muss die Einwilligung der Kunden zum automatisierten Mailkontakt vorliegen.
-- Für den genutzten E-Mail-Dienstleister ist ein Auftragsverarbeitungsvertrag (AVV) abzuschließen.
-- SPF/DKIM/DMARC sollten für die Versanddomain korrekt eingerichtet sein, um Zustellprobleme zu vermeiden.
+1. Installiere den lokalen SMTP-Server:
+   ```powershell
+   python -m pip install aiosmtpd
+   python smtp_server.py
+   ```
+2. Setze in `App/.env`:
+   ```env
+   MAIL_SERVER=127.0.0.1
+   MAIL_PORT=1025
+   MAIL_USE_TLS=False
+   MAIL_SUPPRESS_SEND=False
+   ```
+3. Starte die Anwendung und registriere einen Kunden über `/registrierung`.
+4. Gesendete E-Mails werden im Terminal des lokalen SMTP-Servers angezeigt.
 
-## Offene Punkte
+## Hinweise
 
-- Vollständige Liste der zu erfassenden Kundenfelder
-- Anlässe/Trigger für automatisierte E-Mails sowie Inhalte der Vorlagen
-- Technische Rahmenbedingungen (Hosting, vorhandene Infrastruktur)
-- Anzahl gleichzeitiger Nutzer
+- Setze `SECRET_KEY` unbedingt sicher, bevor du die App produktiv einsetzt.
+- `APP_ENV=produktion` und `FLASK_DEBUG=0` sind für den Live-Betrieb empfohlen.
+- Für echte SMTP-Verwendung sollten SPF/DKIM/DMARC geprüft werden.
 
-## Projektstatus
+## Weiteres
 
-In Entwicklung.
+Siehe `App/installation_guide.md` für eine ausführliche Installations- und Startanleitung.
 
-## Kontakt
-
-Sportless GmbH, Abentheuer

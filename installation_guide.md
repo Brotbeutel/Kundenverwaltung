@@ -4,14 +4,15 @@ Diese Anleitung beschreibt, wie du die Kundenverwaltungs-Anwendung lokal startes
 
 ## Voraussetzungen
 
-- Python 3.10+ (empfohlen: 3.14)
-- 'pip' für die Paketinstallation
+- Python 3.10 oder neuer
+- `pip` für die Paketinstallation
+- PowerShell, CMD oder Bash
 
-> Hinweis: Wenn mehrere Python-Versionen installiert sind, verwende den vollständigen Pfad zum normalen Windows-Python, z. B. `C:\Users\Student\AppData\Local\Python\bin\python.exe` - anstatt python [befehl]
+> Wenn mehrere Python-Versionen installiert sind, verwende den vollständigen Pfad zum gewünschten Python-Executable.
 
 ## 1. Projektordner
 
-Öffne ein Terminal und wechsle in das App-Verzeichnis:
+Wechsle in das `App`-Verzeichnis:
 
 ```powershell
 cd C:\GitHub\Kundenverwaltung\App
@@ -19,7 +20,7 @@ cd C:\GitHub\Kundenverwaltung\App
 
 ## 2. Virtuelle Umgebung anlegen
 
-Lege eine projektlokale virtuelle Umgebung an:
+Erstelle eine lokale virtuelle Umgebung:
 
 ```powershell
 python -m venv .venv
@@ -47,52 +48,54 @@ python -m pip install --upgrade pip
 python -m pip install -r requirements.txt
 ```
 
-## 4. Umgebungsvariablen konfigurieren
+## 4. `.env` konfigurieren
 
-Erstelle im Ordner `App` eine Datei `.env` mit den benötigten Einstellungen.
+Kopiere das Beispiel und passe die Werte an:
 
-### Minimalbeispiel für lokale Entwicklung
+```powershell
+copy .env.example .env
+```
+
+### Beispielwerte für `.env`
 
 ```env
 FLASK_DEBUG=1
 APP_ENV=entwicklung
 SECRET_KEY=ein-sicheres-geheimnis
+DATABASE_URL=sqlite:///kundenverwaltung.db
+ADMIN_STANDARD_PASSWORT=aendere-mich-admin123
+MITARBEITER_STANDARD_PASSWORT=aendere-mich-mit123
 
-# SQLite (Standard) - optional, falls du keine andere DB verwenden möchtest
-# DATABASE_URL=sqlite:///kundenverwaltung.db
-
-MAIL_SERVER=smtp.mailtrap.io
-MAIL_PORT=2525
-MAIL_USE_TLS=True
+MAIL_SERVER=127.0.0.1
+MAIL_PORT=1025
+MAIL_USE_TLS=False
 MAIL_USERNAME=
 MAIL_PASSWORD=
 MAIL_DEFAULT_SENDER=kundenverwaltung@sportless-gmbh.de
 MAIL_SUPPRESS_SEND=True
-
-ADMIN_STANDARD_PASSWORT=aendere-mich-admin123
-MITARBEITER_STANDARD_PASSWORT=aendere-mich-mit123
 ```
 
-### Wichtige Hinweise
+### Hinweise
 
-- `MAIL_SUPPRESS_SEND=True` verhindert das tatsächliche Versenden von E-Mails. Für echte Mails auf `False` setzen.
-- `DATABASE_URL` kann auf eine PostgreSQL- oder MySQL-URL zeigen. Ohne `DATABASE_URL` verwendet die App `sqlite:///kundenverwaltung.db`.
-- Ändere `SECRET_KEY` unbedingt vor dem produktiven Einsatz.
+- `SECRET_KEY` sollte für den produktiven Einsatz geändert werden.
+- Ohne `DATABASE_URL` verwendet die App standardmäßig `sqlite:///kundenverwaltung.db`.
+- Mail-Einstellungen können jetzt über `.env` gesetzt werden.
+- `MAIL_SUPPRESS_SEND=True` verhindert das tatsächliche Versenden.
 
 ## 5. Datenbank initialisieren
 
-Führe das Setup-Skript aus, um die Tabellen zu erstellen und Beispielkonten anzulegen:
+Erstelle die Tabellen und lege die Standardkonten an:
 
 ```powershell
 python init_db.py
 ```
 
-Das Skript legt standardmäßig diese Benutzer an:
+Standardkonten:
 
 - Admin: `admin` / `aendere-mich-admin123`
 - Mitarbeiter: `mitarbeiter` / `aendere-mich-mit123`
 
-Wenn du eigene Passwörter verwenden möchtest, setze die Umgebungsvariablen `ADMIN_STANDARD_PASSWORT` und `MITARBEITER_STANDARD_PASSWORT`.
+Wenn du eigene Passwörter verwenden möchtest, setze die Variablen `ADMIN_STANDARD_PASSWORT` und `MITARBEITER_STANDARD_PASSWORT` in `.env`.
 
 ## 6. Anwendung starten
 
@@ -100,19 +103,20 @@ Wenn du eigene Passwörter verwenden möchtest, setze die Umgebungsvariablen `AD
 python app.py
 ```
 
-Die Anwendung läuft standardmäßig unter:
+Die Anwendung ist erreichbar unter:
 
 - `http://127.0.0.1:5000`
 
-## 7. Lokaler E-Mail-Test (optional)
+## 7. Lokaler SMTP-Test (optional)
 
-Für lokale SMTP-Tests kannst du den mitgelieferten Testserver starten:
+Installiere optional `aiosmtpd`, wenn du den lokalen Testserver nutzen möchtest:
 
 ```powershell
+python -m pip install aiosmtpd
 python smtp_server.py
 ```
 
-Anschließend in `.env` konfiguriere:
+Für den Testserver sollte deine `.env` enthalten:
 
 ```env
 MAIL_SERVER=127.0.0.1
@@ -121,20 +125,20 @@ MAIL_USE_TLS=False
 MAIL_SUPPRESS_SEND=False
 ```
 
-## 8. Hinweise für Windows mit mehreren Python-Installationen
+## 8. Tipps bei mehreren Python-Versionen
 
-Wenn `python` im Terminal auf die falsche Version zeigt, verwende stattdessen den vollständigen Installationspfad, z. B.:
+Wenn `python` nicht die gewünschte Version verwendet, starte Befehle mit dem vollständigen Pfad:
 
 ```powershell
-C:\Users\Student\AppData\Local\Python\bin\python.exe -m venv .venv
-C:\Users\Student\AppData\Local\Python\bin\python.exe -m pip install -r requirements.txt
-C:\Users\Student\AppData\Local\Python\bin\python.exe init_db.py
-C:\Users\Student\AppData\Local\Python\bin\python.exe app.py
+C:\Users\Student\AppData\Local\Python\Python310\python.exe -m venv .venv
+C:\Users\Student\AppData\Local\Python\Python310\python.exe -m pip install -r requirements.txt
+C:\Users\Student\AppData\Local\Python\Python310\python.exe init_db.py
+C:\Users\Student\AppData\Local\Python\Python310\python.exe app.py
 ```
 
 ## 9. Produktionshinweise
 
-- Stelle sicher, dass `SECRET_KEY` sicher gesetzt ist.
 - Setze `APP_ENV=produktion` und `FLASK_DEBUG=0`.
-- Leite E-Mails über einen produktiven SMTP-Provider weiter und überprüfe SPF/DKIM/DMARC.
-- Verwende bei Bedarf einen WSGI-Server wie `gunicorn` oder `waitress` statt des integrierten Flask-Servers.
+- Verwende ein sicheres `SECRET_KEY`.
+- Nutze für den Produktiveinsatz einen WSGI-Server wie `gunicorn` oder `waitress`.
+- Prüfe SPF/DKIM/DMARC beim Einsatz eines externen SMTP-Dienstes.
