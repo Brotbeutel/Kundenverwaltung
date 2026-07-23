@@ -1,0 +1,127 @@
+{% extends "base.html" %}
+{% block titel %}Kunden{% endblock %}
+
+{% block inhalt %}
+<div class="max-w-6xl mx-auto px-5 sm:px-8 py-8">
+
+  <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-6">
+    <div>
+      <p class="text-xs font-mono uppercase tracking-widest text-inkmuted mb-1">Startliste</p>
+      <h1 class="font-display text-2xl sm:text-3xl">Kunden</h1>
+    </div>
+    <div class="flex flex-wrap items-center gap-2">
+      <!-- Unser neuer Geburtstagssimulationsknopf -->
+      <a href="{{ url_for('kunden.geburtstag_simulation') }}"
+        class="inline-flex items-center justify-center gap-2 bg-pitch text-white text-sm font-medium rounded-lg px-4 py-2.5 hover:bg-opacity-95 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-pitch w-fit">
+        🎂 Geburtstagstext-Test
+      </a>
+
+      <!-- Original Bottum fur Kunde-->
+      <a href="{{ url_for('kunden.kunde_neu') }}"
+        class="inline-flex items-center justify-center gap-2 bg-ink text-white text-sm font-medium rounded-lg px-4 py-2.5 hover:bg-accent transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 w-fit">
+        <span class="text-lg leading-none">+</span> Neuer Kunde
+      </a>
+    </div>
+  </div>
+
+  <form method="get" action="{{ url_for('kunden.kunden_liste') }}" class="mb-6">
+    <div class="relative max-w-sm">
+      <input type="text" name="q" value="{{ suchbegriff }}" placeholder="Name, Firma oder Ort suchen …"
+        class="w-full border border-line rounded-lg pl-9 pr-3 py-2.5 text-sm bg-white focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus:border-accent transition-colors">
+      <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-inkmuted" fill="none" viewBox="0 0 24 24"
+        stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35M17 10a7 7 0 11-14 0 7 7 0 0114 0z" />
+      </svg>
+    </div>
+  </form>
+
+  {% if kunden %}
+  <div class="border border-line rounded-xl bg-white overflow-hidden">
+    <div class="overflow-x-auto">
+      <table class="w-full text-sm">
+        <thead>
+          <tr class="border-b border-line text-left text-xs font-mono uppercase tracking-wider text-inkmuted">
+            <th class="px-4 py-3 w-16">Nr.</th>
+            <th class="px-4 py-3">Name</th>
+            <th class="px-4 py-3 hidden md:table-cell">Firma</th>
+            <th class="px-4 py-3 hidden lg:table-cell">Ort</th>
+            <th class="px-4 py-3 hidden md:table-cell">Kontakt</th>
+            <th class="px-4 py-3 text-right">Aktionen</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for kunde in kunden %}
+          <tr class="border-b border-line last:border-0 hover:bg-chalk transition-colors">
+            <td class="px-4 py-3">
+              <span
+                class="inline-flex items-center justify-center w-9 h-9 rounded-md bg-ink text-white font-mono text-xs">
+                {{ "%02d"|format(loop.index) }}
+              </span>
+            </td>
+            <td class="px-4 py-3">
+              <div class="font-medium">{{ kunde.vollstaendiger_name }}</div>
+              <div class="text-xs text-inkmuted md:hidden">{{ kunde.firma or "—" }}</div>
+            </td>
+            <td class="px-4 py-3 hidden md:table-cell text-inkmuted">{{ kunde.firma or "—" }}</td>
+            <td class="px-4 py-3 hidden lg:table-cell text-inkmuted">{{ kunde.ort or "—" }}</td>
+            <td class="px-4 py-3 hidden md:table-cell text-inkmuted">
+              {% if kunde.email %}<div>{{ kunde.email }}</div>{% endif %}
+              {% if kunde.telefon %}<div class="font-mono text-xs">{{ kunde.telefon }}</div>{% endif %}
+              {% if not kunde.email and not kunde.telefon %}—{% endif %}
+            </td>
+            <td class="px-4 py-3">
+              <div class="flex items-center justify-end gap-2">
+                <a href="{{ url_for('kunden.kunde_bearbeiten', id=kunde.id) }}"
+                  class="text-xs font-medium border border-line rounded-md px-3 py-1.5 hover:border-ink transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-accent">
+                  Bearbeiten
+                </a>
+                {% if current_user.ist_admin %}
+                <form method="post" action="{{ url_for('kunden.kunde_loeschen', id=kunde.id) }}"
+                  onsubmit="return confirm('Kunde {{ kunde.vollstaendiger_name }} wirklich endgültig löschen? Dies kann nicht rückgängig gemacht werden.');">
+                  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                  <button type="submit"
+                    class="text-xs font-medium border border-danger/30 text-danger rounded-md px-3 py-1.5 hover:bg-dangerlight transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-danger">
+                    Löschen
+                  </button>
+                </form>
+                {% else %}
+                <span title="Löschen ist nur Administratoren vorbehalten (DSGVO)"
+                  class="inline-flex items-center gap-1 text-xs text-inkmuted/60 border border-line rounded-md px-3 py-1.5 cursor-not-allowed">
+                  <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                      d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 10-8 0v4h8z" />
+                  </svg>
+                  Löschen
+                </span>
+                {% endif %}
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  {% else %}
+  <div class="border border-dashed border-line rounded-xl bg-white px-8 py-16 text-center">
+    <p class="font-display text-lg mb-2">
+      {% if suchbegriff %}Keine Treffer für „{{ suchbegriff }}"{% else %}Noch keine Kunden angelegt{% endif %}
+    </p>
+    <p class="text-inkmuted text-sm mb-6">
+      {% if suchbegriff %}
+      Versuchen Sie einen anderen Suchbegriff.
+      {% else %}
+      Legen Sie den ersten Kunden an, um die Startliste zu füllen.
+      {% endif %}
+    </p>
+    {% if not suchbegriff %}
+    <a href="{{ url_for('kunden.kunde_neu') }}"
+      class="inline-flex items-center gap-2 bg-ink text-white text-sm font-medium rounded-lg px-4 py-2.5 hover:bg-accent transition-colors">
+      <span class="text-lg leading-none">+</span> Ersten Kunden anlegen
+    </a>
+    {% endif %}
+  </div>
+  {% endif %}
+
+</div>
+{% endblock %}

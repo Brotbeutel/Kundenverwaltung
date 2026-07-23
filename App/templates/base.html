@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block titel %}Kundenverwaltung{% endblock %} · Sportless GmbH</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap"
+    rel="stylesheet">
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            chalk: '#F6F6F3',
+            ink: '#15181C',
+            inkmuted: '#6B7280',
+            line: '#E3E3DE',
+            accent: '#E8432C',
+            accentdark: '#B3341F',
+            pitch: '#1F7A4D',
+            pitchlight: '#E6F2EC',
+            danger: '#8B1E14',
+            dangerlight: '#F7E9E7',
+          },
+          fontFamily: {
+            display: ['"Archivo Black"', 'sans-serif'],
+            body: ['Inter', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          },
+        },
+      },
+    };
+  </script>
+
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+
+    .finish-line {
+      height: 4px;
+      background-image: repeating-linear-gradient(-45deg,
+          #15181C 0px, #15181C 10px,
+          #E8432C 10px, #E8432C 20px);
+    }
+
+    ::selection {
+      background-color: #E8432C;
+      color: #FFFFFF;
+    }
+  </style>
+</head>
+
+<body class="bg-chalk text-ink font-body antialiased min-h-screen flex flex-col">
+
+  {% if current_user.is_authenticated %}
+  <header class="bg-ink text-chalk">
+    <div class="max-w-6xl mx-auto px-5 sm:px-8 flex items-center justify-between h-16">
+      <a href="{{ url_for('kunden.kunden_liste') }}"
+        class="flex items-baseline gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent rounded">
+        <span class="font-display text-lg tracking-wide">SPORTLESS</span>
+        <span class="hidden sm:inline text-xs text-inkmuted font-mono tracking-widest">KUNDENVERWALTUNG</span>
+      </a>
+
+      <div class="flex items-center gap-4">
+        <span class="hidden sm:flex items-center gap-2 text-sm">
+          <span class="text-chalk/80">{{ current_user.anzeigename }}</span>
+          {% if current_user.ist_admin %}
+          <span
+            class="text-[11px] font-mono uppercase tracking-wider bg-accent text-white px-2 py-0.5 rounded">Admin</span>
+          {% else %}
+          <span
+            class="text-[11px] font-mono uppercase tracking-wider bg-white/10 text-chalk/70 px-2 py-0.5 rounded">Mitarbeiter</span>
+          {% endif %}
+        </span>
+        <form method="post" action="{{ url_for('auth.logout') }}">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <button type="submit"
+            class="text-sm text-chalk/70 hover:text-white transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-accent rounded px-2 py-1">
+            Abmelden
+          </button>
+        </form>
+      </div>
+    </div>
+    <div class="finish-line"></div>
+  </header>
+  {% endif %}
+
+  <main class="flex-1 w-full">
+    {% with nachrichten = get_flashed_messages(with_categories=true) %}
+    {% if nachrichten %}
+    <div class="max-w-6xl mx-auto px-5 sm:px-8 pt-6 space-y-2">
+      {% for kategorie, text in nachrichten %}
+      {% set stil = {
+      'success': 'bg-pitchlight text-pitch border-pitch/30',
+      'error': 'bg-dangerlight text-danger border-danger/30',
+      'info': 'bg-white text-ink border-line'
+      }.get(kategorie, 'bg-white text-ink border-line') %}
+      <div class="border rounded-lg px-4 py-3 text-sm font-medium {{ stil }}" role="status">
+        {{ text }}
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+    {% endwith %}
+
+    {% block inhalt %}{% endblock %}
+  </main>
+
+  <footer class="border-t border-line mt-12">
+    <div class="max-w-6xl mx-auto px-5 sm:px-8 py-6 text-xs text-inkmuted font-mono">
+      Sportless GmbH · Interne Kundenverwaltung · DSGVO-konform
+    </div>
+  </footer>
+
+</body>
+
+</html>
