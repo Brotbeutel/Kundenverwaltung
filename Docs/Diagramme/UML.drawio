@@ -1,14 +1,32 @@
 <mxfile host="Electron">
   <diagram name="Seite-1" id="50iirXPqUA6OReaQ2v6U">
-    <mxGraphModel dx="808" dy="549" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+    <mxGraphModel dx="1712" dy="701" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
-        <mxCell id="X4A22WFTHhG7RHh9U2I_-1" parent="1" style="verticalAlign=top;align=left;overflow=fill;html=1;whiteSpace=wrap;" value="&lt;div style=&quot;box-sizing: border-box; width: 100%; background: rgb(228, 228, 228); padding: 2px;&quot;&gt;Kunde&lt;/div&gt;&lt;table style=&quot;width:100%;font-size:1em;&quot; cellpadding=&quot;2&quot; cellspacing=&quot;0&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td&gt;PK&lt;/td&gt;&lt;td&gt;kundenID&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;FK1&lt;/td&gt;&lt;td&gt;vorname&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;FK2&lt;/td&gt;&lt;td&gt;nachname&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;FK3&lt;/td&gt;&lt;td&gt;e-mail-adresse&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;FK4&lt;/td&gt;&lt;td&gt;geburtsdatum&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;FK5&lt;/td&gt;&lt;td&gt;geschlecht&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;FK6&lt;/td&gt;&lt;td&gt;telefonnummer&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;FK7&lt;/td&gt;&lt;td&gt;straße&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;FK8&lt;/td&gt;&lt;td&gt;hausnummer&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;FK9&lt;/td&gt;&lt;td&gt;ort&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;FK10&lt;/td&gt;&lt;td&gt;plz&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;FK11&lt;/td&gt;&lt;td&gt;land&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;FK12&lt;/td&gt;&lt;td&gt;firma&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;" vertex="1">
-          <mxGeometry height="270" width="180" x="390" y="310" as="geometry" />
+        <mxCell id="X4A22WFTHhG7RHh9U2I_-1" parent="1" style="verticalAlign=top;align=left;overflow=fill;html=1;whiteSpace=wrap;" value="&lt;div style=&quot;box-sizing: border-box; width: 100%; background: rgb(228, 228, 228); padding: 2px;&quot;&gt;Kunde&lt;/div&gt;&lt;table style=&quot;width:100%;font-size:1em;&quot; cellpadding=&quot;2&quot; cellspacing=&quot;0&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td&gt;PK | int&lt;/td&gt;&lt;td&gt;kundenID&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;string&lt;/td&gt;&lt;td&gt;vorname&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;string&lt;/td&gt;&lt;td&gt;nachname&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;string&lt;/td&gt;&lt;td&gt;e-mail-adresse&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;date&lt;/td&gt;&lt;td&gt;geburtsdatum&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;char&lt;/td&gt;&lt;td&gt;geschlecht&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;int&lt;/td&gt;&lt;td&gt;telefonnummer&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;string&lt;/td&gt;&lt;td&gt;straße&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;int&lt;/td&gt;&lt;td&gt;hausnummer&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;string&lt;/td&gt;&lt;td&gt;ort&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;int&lt;/td&gt;&lt;td&gt;plz&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;string&lt;/td&gt;&lt;td&gt;land&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;string&lt;/td&gt;&lt;td&gt;firma&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;" vertex="1">
+          <mxGeometry height="270" width="180" x="440" y="160" as="geometry" />
         </mxCell>
-        <mxCell id="X4A22WFTHhG7RHh9U2I_-2" parent="1" style="verticalAlign=top;align=left;overflow=fill;html=1;whiteSpace=wrap;" value="&lt;div style=&quot;box-sizing: border-box; width: 100%; background: rgb(228, 228, 228); padding: 2px;&quot;&gt;Benutzer&lt;/div&gt;&lt;table style=&quot;width:100%;font-size:1em;&quot; cellpadding=&quot;2&quot; cellspacing=&quot;0&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td&gt;PK&lt;/td&gt;&lt;td&gt;benutzerID&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;FK1&lt;/td&gt;&lt;td&gt;benutzername&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;FK2&lt;/td&gt;&lt;td&gt;passwort&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;" vertex="1">
-          <mxGeometry height="90" width="180" x="150" y="310" as="geometry" />
+        <mxCell id="zfPI0GhU7nd9AGXqAx97-1" edge="1" parent="1" source="X4A22WFTHhG7RHh9U2I_-2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" target="X4A22WFTHhG7RHh9U2I_-1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="zfPI0GhU7nd9AGXqAx97-2" connectable="0" parent="zfPI0GhU7nd9AGXqAx97-1" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" value="1" vertex="1">
+          <mxGeometry relative="1" x="-0.672" as="geometry">
+            <mxPoint x="4" y="-5" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="zfPI0GhU7nd9AGXqAx97-3" connectable="0" parent="zfPI0GhU7nd9AGXqAx97-1" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" value="n" vertex="1">
+          <mxGeometry relative="1" x="0.696" y="3" as="geometry">
+            <mxPoint x="-15" y="-2" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="zfPI0GhU7nd9AGXqAx97-4" connectable="0" parent="zfPI0GhU7nd9AGXqAx97-1" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" value="verwaltet" vertex="1">
+          <mxGeometry relative="1" x="-0.06" y="-1" as="geometry">
+            <mxPoint y="-16" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="X4A22WFTHhG7RHh9U2I_-2" parent="1" style="verticalAlign=top;align=left;overflow=fill;html=1;whiteSpace=wrap;" value="&lt;div style=&quot;box-sizing: border-box; width: 100%; background: rgb(228, 228, 228); padding: 2px;&quot;&gt;Benutzer&lt;/div&gt;&lt;table style=&quot;width:100%;font-size:1em;&quot; cellpadding=&quot;2&quot; cellspacing=&quot;0&quot;&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td&gt;PK | int&lt;/td&gt;&lt;td&gt;benutzerID&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;string&lt;/td&gt;&lt;td&gt;benutzername&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;string&lt;/td&gt;&lt;td&gt;passwort&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;string&lt;/td&gt;&lt;td&gt;berechtigung&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;" vertex="1">
+          <mxGeometry height="90" width="180" x="160" y="250" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>
