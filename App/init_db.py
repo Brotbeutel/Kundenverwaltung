@@ -1,7 +1,7 @@
 """
 init_db.py
 ----------
-Einmaliges Setup-Skript.
+One-time database setup script.
 """
 
 import os
@@ -16,7 +16,7 @@ from models import db, Mitarbeiter, Rolle
 
 
 def erstelle_app() -> Flask:
-    """Erstellt einen eigenständigen Flask-App-Kontext für das DB-Setup."""
+    """Create an isolated Flask application context for the database setup."""
     app = Flask(__name__)
 
     is_debug = os.environ.get("FLASK_DEBUG", "1") == "1"
@@ -28,7 +28,7 @@ def erstelle_app() -> Flask:
 
 
 def lege_testkonten_an() -> None:
-    """Legt Admin- und Mitarbeiterkonto an, falls sie noch nicht existieren."""
+    """Create the admin and employee accounts if they do not already exist."""
     admin_pw = os.environ.get("ADMIN_STANDARD_PASSWORT", "aendere-mich-admin123")
     mitarbeiter_pw = os.environ.get("MITARBEITER_STANDARD_PASSWORT", "aendere-mich-mit123")
 

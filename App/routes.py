@@ -1,24 +1,23 @@
 """
 routes.py
 ---------
-Routen der Kundenverwaltungs-Anwendung, aufgeteilt in zwei Blueprints:
+Routes for the customer management application, split into two blueprints:
 
-    - auth_bp:   Login / Logout
-    - kunden_bp: Kunden-CRUD (Anlegen, Anzeigen, Bearbeiten, Löschen)
+    - auth_bp:   login / logout
+    - kunden_bp: customer CRUD (create, list, edit, delete)
 
-Rechte-Modell:
-    - Alle Routen (außer /login) erfordern eine angemeldete Sitzung
+Access model:
+    - All routes except /login require an authenticated session
       (@login_required).
-    - Anlegen und Bearbeiten von Kunden ist jedem angemeldeten Mitarbeiter
-      erlaubt.
-    - Das endgültige Löschen eines Kundendatensatzes (DSGVO) ist
-      ausschließlich der Rolle 'admin' vorbehalten (@admin_erforderlich).
-      Ein Zugriffsversuch durch einen normalen Mitarbeiter wird mit
-      HTTP 403 Forbidden abgelehnt.
+    - Creating and editing customers is allowed for any authenticated
+      employee.
+    - Final deletion of a customer record (DSGVO) is restricted to the
+      'admin' role (@admin_erforderlich).
+      Attempts by regular employees are rejected with HTTP 403 Forbidden.
 
-Die HTML-Templates (login.html, kunden_liste.html, kunde_formular.html)
-folgen in Schritt 4 - hier wird bereits mit den finalen Template- und
-Variablennamen gearbeitet, damit Schritt 4 direkt andocken kann.
+The HTML templates (login.html, kunden_liste.html, kunde_formular.html)
+use the final template and variable names so the later steps can integrate
+cleanly.
 """
 from datetime import datetime
 from datetime import date, timedelta
@@ -46,15 +45,15 @@ kunden_bp = Blueprint("kunden", __name__)
 
 
 # ---------------------------------------------------------------------------
-# Decorator: Zugriff auf Admin-Rolle beschränken
+# Decorator: restrict access to the admin role
 # ---------------------------------------------------------------------------
 def admin_erforderlich(view_funktion):
-    """Beschränkt eine Route auf Mitarbeiter mit der Rolle 'admin'.
+    """Restrict a route to employees with the 'admin' role.
 
-    Setzt @login_required voraus bzw. prüft zusätzlich, ob überhaupt ein
-    Benutzer angemeldet ist. Nicht-Admins erhalten HTTP 403 Forbidden -
-    das ist die geforderte DSGVO-Absicherung für das harte Löschen von
-    Kundendaten.
+    This decorator expects @login_required to be applied first, and it
+    additionally checks whether a user is authenticated at all. Non-admins
+    receive HTTP 403 Forbidden, which provides the required GDPR safeguard
+    for hard deletion of customer data.
     """
 
     @wraps(view_funktion)
@@ -69,17 +68,17 @@ def admin_erforderlich(view_funktion):
 
 
 def login_manager_redirect():
-    """Hilfsfunktion, falls admin_erforderlich ohne vorheriges
-    @login_required auf einer Route landet (defensive Absicherung)."""
+    """Helper used when admin_erforderlich is applied without a preceding
+    @login_required check (defensive safeguard)."""
     return redirect(url_for("auth.login", next=request.path))
 
 
 # ---------------------------------------------------------------------------
-# Auth-Blueprint: Startseite
+# Auth blueprint: landing page
 # ---------------------------------------------------------------------------
 @auth_bp.route("/")
 def startseite():
-    """Zeigt die Willkommensseite der Anwendung an."""
+    """Render the application landing page."""
     from flask_login import current_user
     if current_user.is_authenticated:
         return redirect(url_for("kunden.kunden_liste"))
@@ -90,11 +89,11 @@ def startseite():
 
 @auth_bp.route("/registrierung", methods=["POST"])
 def selbst_registrierung():
-    """Ermöglicht Kunden, sich selbst von der Startseite aus zu registrieren."""
-    # Создаем новый пустой объект клиента
+    """Allow customers to self-register from the landing page."""
+    # Create a new empty customer object
     kunde = Kunde()
 
-    # Собираем данные из формы
+    # Collect form data
     fehler = _kundendaten_aus_formular(kunde)
 
     if fehler:
@@ -102,13 +101,13 @@ def selbst_registrierung():
             flash(meldung, "error")
         return redirect(url_for("auth.startseite"))
 
-    # Так как клиент регистрируется сам, поле сотрудника остается пустым (None)
+    # Since the customer registers themselves, the employee field remains empty (None)
     kunde.angelegt_von_id = None
 
     db.session.add(kunde)
     db.session.commit()
 
-    # Отправляем e-mail с благодарностью за регистрацию!
+    # Send a thank-you email after successful registration
     if kunde.email:
         from app import mail
         msg = Message(
@@ -129,13 +128,13 @@ def selbst_registrierung():
     return redirect(url_for("auth.startseite"))
 
 # ---------------------------------------------------------------------------
-# Auth-Blueprint: Login / Logout
+# Auth blueprint: login / logout
 # ---------------------------------------------------------------------------
 @auth_bp.route("/login", methods=["GET", "POST"])
 def login():
-    """Meldet einen Mitarbeiter anhand von Benutzername und Passwort an."""
+    """Authenticate an employee using username and password."""
 
-    # Bereits angemeldete Mitarbeiter direkt weiterleiten
+    # Redirect already authenticated employees directly
     if current_user.is_authenticated:
         return redirect(url_for("kunden.kunden_liste"))
 
@@ -160,7 +159,7 @@ def login():
         login_user(mitarbeiter, remember=angemeldet_bleiben)
         flash(f"Willkommen zurück, {mitarbeiter.anzeigename}!", "success")
 
-        # Offene Umleitung vermeiden: nur relative Pfade aus 'next' übernehmen
+        # Prevent open redirects: only accept relative paths from 'next'
         ziel = request.args.get("next")
         if ziel and ziel.startswith("/"):
             return redirect(ziel)
@@ -172,19 +171,19 @@ def login():
 @auth_bp.route("/logout", methods=["GET", "POST"])
 @login_required
 def logout():
-    """Beendet die aktuelle Sitzung sicher."""
+    """End the current session safely."""
     logout_user()
     flash("Sie wurden abgemeldet.", "info")
     return redirect(url_for("auth.login"))
 
 
 # ---------------------------------------------------------------------------
-# Kunden-Blueprint: CRUD
+# Customer blueprint: CRUD
 # ---------------------------------------------------------------------------
 @kunden_bp.route("/kunden")
 @login_required
 def kunden_liste():
-    """Zeigt alle Kunden an, optional gefiltert über den Query-Parameter 'q'."""
+    """List all customers, optionally filtered via the 'q' query parameter."""
     suchbegriff = request.args.get("q", "").strip()
 
     abfrage = Kunde.query
@@ -204,9 +203,9 @@ def kunden_liste():
 
 
 def _kundendaten_aus_formular(kunde: Kunde) -> list[str]:
-    """Überträgt Formulardaten aus request.form in ein Kunde-Objekt.
+    """Copy form data from request.form into a Kunde object.
 
-    Gibt eine Liste von Validierungsfehlern zurück (leer = alles ok).
+    Returns a list of validation errors (empty means everything is valid).
     """
     fehler = []
 
@@ -228,11 +227,11 @@ def _kundendaten_aus_formular(kunde: Kunde) -> list[str]:
     kunde.telefon = request.form.get("telefon", "").strip() or None
     kunde.notizen = request.form.get("notizen", "").strip() or None
 
-    # Data lesen aus POST
+    # Read the date from the POST payload
     geburtsdatum_str = request.form.get("geburtsdatum", "").strip()
     if geburtsdatum_str:
         try:
-            # Превращаем строку "YYYY-MM-DD" в объект date для SQLAlchemy
+            # Convert the string "YYYY-MM-DD" into a SQLAlchemy date object
             kunde.geburtsdatum = datetime.strptime(geburtsdatum_str, "%Y-%m-%d").date()
         except ValueError:
             fehler.append("Das Geburtsdatum hat ein ungültiges Format.")
@@ -245,11 +244,10 @@ def _kundendaten_aus_formular(kunde: Kunde) -> list[str]:
 @kunden_bp.route("/kunde/neu", methods=["GET", "POST"])
 @login_required
 def kunde_neu():
-    """Erstellt einen neuen Kundendatensatz.
+    """Create a new customer record.
 
-    Die ID des anlegenden Mitarbeiters wird automatisch aus der laufenden
-    Sitzung (current_user) übernommen - kann vom Formular nicht überschrieben
-    werden.
+    The ID of the creating employee is taken automatically from the current
+    session (current_user) and cannot be overridden by the form.
     """
     kunde = Kunde()
 
@@ -274,8 +272,8 @@ def kunde_neu():
 @kunden_bp.route("/kunde/<int:id>/bearbeiten", methods=["GET", "POST"])
 @login_required
 def kunde_bearbeiten(id: int):
-    """Bearbeitet einen bestehenden Kunden. Für alle angemeldeten
-    Mitarbeiter zugänglich (kein admin_erforderlich)."""
+    """Edit an existing customer. Accessible to all authenticated employees
+    without requiring admin privileges."""
     kunde = db.session.get(Kunde, id)
     if kunde is None:
         abort(404)
@@ -299,12 +297,11 @@ def kunde_bearbeiten(id: int):
 @login_required
 @admin_erforderlich
 def kunde_loeschen(id: int):
-    """Löscht einen Kundendatensatz endgültig (hartes Löschen).
+    """Permanently delete a customer record (hard delete).
 
-    DSGVO-Vorgabe: Ausschließlich Mitarbeiter mit der Rolle 'admin' dürfen
-    diese Route aufrufen. Der admin_erforderlich-Decorator sorgt dafür,
-    dass normale Mitarbeiter mit HTTP 403 Forbidden abgewiesen werden,
-    bevor diese Funktion überhaupt ausgeführt wird.
+    GDPR requirement: only employees with the 'admin' role may access this
+    route. The admin_erforderlich decorator ensures that regular employees
+    receive HTTP 403 Forbidden before the function is executed.
     """
     kunde = db.session.get(Kunde, id)
     if kunde is None:
@@ -325,41 +322,41 @@ import random
 @kunden_bp.route("/kunden/geburtstag-test")
 @login_required
 def geburtstag_simulation():
-    """Simuliert die automatische Überprüfung und den Versand von Geburtstags-Mails."""
+    """Simulate automated birthday-mail checking and sending."""
     from app import mail
     from flask_mail import Message
 
     heute = date.today()
-    # ВРЕМЕННЫЙ ПРИНТ ДЛЯ ПРОВЕРКИ В ТЕРМИНАЛЕ:
-    print(f"=== SIMULATION START: SUTCHDATUM IST {heute.day}.{heute.month} ===")
+    # Temporary terminal print for verification during development
+    print(f"=== SIMULATION START: TODAY IS {heute.day}.{heute.month} ===")
 
     alle_kunden = Kunde.query.all()
     geburtstagskinder = []
 
     for kunde in alle_kunden:
-        # Тоже выведем в консоль всех, кого проверяем
-        print(f"Prüfe Kunde: {kunde.vollstaendiger_name}, Geburtstag im System: {kunde.geburtsdatum}")
+        # Also print each customer we are checking to the console
+        print(f"Checking customer: {kunde.vollstaendiger_name}, birthday in system: {kunde.geburtsdatum}")
         if kunde.geburtsdatum and kunde.geburtsdatum.day == heute.day and kunde.geburtsdatum.month == heute.month:
             geburtstagskinder.append(kunde)
 
-    print(f"Gefundene Geburtstagskinder: {len(geburtstagskinder)}")
+    print(f"Birthday customers found: {len(geburtstagskinder)}")
 
     if not geburtstagskinder:
-        flash("Heute hat kein Kunde Geburtstag. Legen Sie im System einen Test-Kunden mit dem heutigen Datum an!", "info")
+        flash("No customer has a birthday today. Create a test customer with today's date in the system.", "info")
         return redirect(url_for("kunden.kunden_liste"))
 
-    # 3. Schleife für den Mail-Versand an alle Geburtstagskinder
+    # 3. Loop over all birthday customers and send their emails
     gesendete_mails = 0
     for kind in geburtstagskinder:
         if not kind.email:
             continue
 
-        # Dynamische Daten für den Gutschein vorbereiten
-        betrag = random.choice([10, 15, 20])  # Zufälliger Betrag
-        code = random.randint(1000, 9999)     # Zufälliger Code-Zusatz
-        gueltig_bis = (heute + timedelta(days=30)).strftime("%d.%m.%Y") # 30 Tage gültig
+        # Prepare dynamic voucher data
+        betrag = random.choice([10, 15, 20])  # Random amount
+        code = random.randint(1000, 9999)     # Random voucher code suffix
+        gueltig_bis = (heute + timedelta(days=30)).strftime("%d.%m.%Y") # 30 days valid
 
-        # Dein Text aus der Aufgabe:
+        # Birthday email text
         mail_text = (
             f"Liebe/r {kind.vorname},\n\n"
             f"zu Ihrem Geburtstag gratuliert Ihnen das gesamte Team von Sportless GmbH ganz herzlich "
@@ -385,8 +382,8 @@ def geburtstag_simulation():
             mail.send(msg)
             gesendete_mails += 1
         except Exception as e:
-            flash(f"Fehler beim Senden an {kind.email}: {str(e)}", "error")
+            flash(f"Error sending to {kind.email}: {str(e)}", "error")
 
     if gesendete_mails > 0:
-        flash(f"Erfolg! {gesendete_mails} Geburtstags-Mail(s) wurden erfolgreich simuliert und versendet.", "success")
+        flash(f"Success! {gesendete_mails} birthday email(s) were simulated and sent.", "success")
     return redirect(url_for("kunden.kunden_liste"))

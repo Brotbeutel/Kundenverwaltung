@@ -1,12 +1,12 @@
 """
 app.py
 ------
-Application-Factory der Kundenverwaltungs-Anwendung.
+Customer management application factory.
 
-Initialisiert Flask sowie die Extensions (SQLAlchemy, Flask-Login,
-Flask-Mail) und registriert die Blueprints aus routes.py.
+Initializes Flask together with the extensions (SQLAlchemy, Flask-Login,
+Flask-Mail) and registers the blueprints from routes.py.
 
-Start (lokal):
+Local startup:
     python app.py
 """
 
@@ -25,23 +25,23 @@ load_dotenv()
 from config import konfigurationen
 from models import db, Mitarbeiter
 
-# --- Extensions (noch ohne App-Bindung, siehe erstelle_app()) ---
+# --- Extensions (initialized first, then bound in create_app()) ---
 login_manager = LoginManager()
 mail = Mail()
-# Schützt alle POST-Formulare (Login, Kunde anlegen/bearbeiten/löschen) vor
-# Cross-Site-Request-Forgery. Jedes <form> in den Templates braucht dafür
-# das versteckte Feld {{ csrf_token() }} (siehe templates/*.html).
+# Protects all POST forms (login, create/edit/delete customer) against
+# cross-site request forgery. Every <form> in the templates must include
+# the hidden field {{ csrf_token() }} (see templates/*.html).
 csrf = CSRFProtect()
 
 
 @event.listens_for(Engine, "connect")
 def _aktiviere_sqlite_fremdschluessel(dbapi_connection, connection_record):
-    """Aktiviert die Durchsetzung von Foreign-Key-Constraints in SQLite.
+    """Enable enforcement of foreign-key constraints in SQLite.
 
-    SQLite ignoriert FOREIGN KEY-Constraints (z.B. ondelete='SET NULL' in
-    models.py) standardmäßig, solange 'PRAGMA foreign_keys=ON' nicht pro
-    Verbindung gesetzt wird. Für andere Datenbanken (z.B. PostgreSQL in
-    Produktion) ist dieser Hook wirkungslos und unschädlich.
+    SQLite ignores foreign-key constraints such as ondelete='SET NULL' in
+    models.py unless 'PRAGMA foreign_keys=ON' is enabled for each connection.
+    For other databases such as PostgreSQL in production, this hook is a
+    no-op and harmless.
     """
     if dbapi_connection.__class__.__module__.startswith("sqlite3"):
         cursor = dbapi_connection.cursor()
@@ -50,16 +50,16 @@ def _aktiviere_sqlite_fremdschluessel(dbapi_connection, connection_record):
 
 
 def erstelle_app() -> Flask:
-    """Erstellt und konfiguriert die Flask-Anwendung (Application-Factory-Pattern)."""
+    """Create and configure the Flask application using the application factory pattern."""
 
     app = Flask(__name__)
 
-    # Umgebung bestimmen (siehe init_db.py für dieselbe Logik)
+    # Determine the environment (see init_db.py for the same logic)
     ist_debug = os.environ.get("FLASK_DEBUG", "1") == "1"
     umgebung = "entwicklung" if ist_debug else os.environ.get("APP_ENV", "produktion")
     app.config.from_object(konfigurationen.get(umgebung, konfigurationen["default"]))
 
-    # --- Extensions an die App binden ---
+    # --- Bind extensions to the app ---
     db.init_app(app)
     mail.init_app(app)
     csrf.init_app(app)
@@ -69,7 +69,7 @@ def erstelle_app() -> Flask:
     login_manager.login_message = "Bitte melden Sie sich an, um fortzufahren."
     login_manager.login_message_category = "info"
 
-    # --- Blueprints registrieren ---
+    # --- Register blueprints ---
     from routes import auth_bp, kunden_bp
 
     app.register_blueprint(auth_bp)
@@ -80,13 +80,12 @@ def erstelle_app() -> Flask:
 
 @login_manager.user_loader
 def lade_benutzer(benutzer_id: str):
-    """Wird von Flask-Login bei jeder Anfrage aufgerufen, um aus der
-    gespeicherten Session-ID wieder ein Mitarbeiter-Objekt zu laden."""
+    """Load an employee object from the stored session ID for each Flask-Login request."""
     return db.session.get(Mitarbeiter, int(benutzer_id))
 
 
-# Modul-Ebene: App-Instanz für den lokalen Start via "python app.py"
-# bzw. für WSGI-Server wie gunicorn ("app:app")
+# Module-level app instance for local startup via "python app.py"
+# or for WSGI servers such as gunicorn ("app:app")
 app = erstelle_app()
 
 
