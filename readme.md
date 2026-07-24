@@ -37,20 +37,34 @@ Diese Anwendung digitalisiert papierbasierte Kundenlisten und bietet einen zentr
 
 Die Hauptanwendung befindet sich in `App/`. Ein Einstieg ist in `App/installation_guide.md` dokumentiert.
 
-### Kurzer Start
+### Einfache Windows-Startoption
+
+Im Projektroot befindet sich `start_app.bat`. Doppelklick auf die Datei oder Ausführen aus PowerShell startet:
+
+1. die normale Windows-Python-Installation
+2. die virtuelle Umgebung
+3. die Abhängigkeiten
+4. die Datenbankinitialisierung
+5. die Flask-Anwendung
+
+```powershell
+cd C:\GitHub\Kundenverwaltung
+.\start_app.bat
+```
+
+### Manueller Start
 
 ```powershell
 cd C:\GitHub\Kundenverwaltung\App
-python -m venv .venv
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\setup_dev_env.ps1
 .\.venv\Scripts\Activate.ps1
-python -m pip install --upgrade pip
-python -m pip install -r requirements.txt
-copy .env.example .env
 python init_db.py
 python app.py
 ```
 
 Öffne dann `http://127.0.0.1:5000` im Browser.
+
+> Wenn VS Code einen anderen Python-Interpreter verwendet, stelle sicher, dass der Workspace `C:\Users\Student\AppData\Local\Python\bin\python.exe` nutzt. Das Repository enthält `.vscode/settings.json` für diese Auswahl.
 
 ## Standardkonten
 
