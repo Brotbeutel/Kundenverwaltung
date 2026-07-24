@@ -10,7 +10,7 @@ Diese Anleitung beschreibt, wie du die Kundenverwaltungs-Anwendung lokal startes
 
 > Wenn mehrere Python-Versionen installiert sind, verwende den vollständigen Pfad zum gewünschten Python-Executable.
 
-## Use the normal Windows Python installation
+## Benutze eine normale Python-Installation
 
 Wenn VS Code aktuell die falsche Python-Installation verwendet (QMK/MSYS), wähle explizit die normale Windows-Python-Installation:
 
