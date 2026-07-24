@@ -37,7 +37,7 @@ class Config:
     MAIL_USERNAME = os.environ.get("MAIL_USERNAME", "")
     MAIL_PASSWORD = os.environ.get("MAIL_PASSWORD", "")
     MAIL_DEFAULT_SENDER = os.environ.get("MAIL_DEFAULT_SENDER", "kundenverwaltung@sportless-gmbh.de")
-
+ 
     MAIL_SUPPRESS_SEND = os.environ.get("MAIL_SUPPRESS_SEND", "False").lower() in ("1", "true", "yes", "on")
     MAIL_SERVER = "127.0.0.1"
     MAIL_PORT = 1025
@@ -45,7 +45,7 @@ class Config:
     MAIL_USERNAME = ""
     MAIL_PASSWORD = ""
     MAIL_DEFAULT_SENDER = "kundenverwaltung@sportless-gmbh.de"
-
+ 
     MAIL_SUPPRESS_SEND = False
 
 

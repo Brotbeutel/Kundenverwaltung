@@ -12,12 +12,18 @@ if (-Not (Test-Path $pythonPath)) {
 
 $venvPath = Join-Path $scriptRoot ".venv"
 $activatePath = Join-Path $venvPath "Scripts\Activate.ps1"
+$pythonInVenv = Join-Path $venvPath "Scripts\python.exe"
 
 Write-Host "Using Python: $pythonPath"
-& $pythonPath -m venv $venvPath
-if ($LASTEXITCODE -ne 0) {
-    Write-Error "Failed to create virtual environment."
-    exit $LASTEXITCODE
+if (-Not (Test-Path $pythonInVenv)) {
+    & $pythonPath -m venv $venvPath
+    if ($LASTEXITCODE -ne 0) {
+        Write-Error "Failed to create virtual environment."
+        exit $LASTEXITCODE
+    }
+}
+else {
+    Write-Host "Using existing virtual environment at $venvPath"
 }
 
 Write-Host "Activating virtual environment..."
