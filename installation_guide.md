@@ -28,10 +28,10 @@ Das Repository enthält zudem eine Arbeitsbereichs-Einstellung in `.vscode/setti
 
 ## 1. Projektordner
 
-Wechsle in das `App`-Verzeichnis:
+Wechsle in das Projekt-Root-Verzeichnis:
 
 ```powershell
-cd C:\GitHub\Kundenverwaltung\App
+cd C:\GitHub\Kundenverwaltung
 ```
 
 ## 2. Bootstrap-Skript verwenden (empfohlen)
@@ -41,8 +41,8 @@ Das Projekt enthält ein Bootstrap-Skript, das die normale Windows-Python-Instal
 ### PowerShell
 
 ```powershell
-cd C:\GitHub\Kundenverwaltung\App
-powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\setup_dev_env.ps1
+cd C:\GitHub\Kundenverwaltung
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\App\setup_dev_env.ps1
 ```
 
 ### Ein-Klick-Launcher für Windows
@@ -67,6 +67,8 @@ Wenn du die Schritte lieber manuell durchführen möchtest, kannst du weiterhin 
 python -m venv .venv
 ```
 
+> Die virtuelle Umgebung wird im Projektroot angelegt. Dadurch ist der gleiche Interpreter sowohl für `init_db.py` als auch für `app.py` und den Mail-Testserver verfügbar.
+
 Aktiviere die Umgebung:
 
 - PowerShell:
@@ -86,7 +88,7 @@ Aktiviere die Umgebung:
 
 ```powershell
 python -m pip install --upgrade pip
-python -m pip install -r requirements.txt
+python -m pip install -r .\App\requirements.txt
 ```
 
 ## 4. `.env` konfigurieren
@@ -94,7 +96,7 @@ python -m pip install -r requirements.txt
 Kopiere das Beispiel und passe die Werte an:
 
 ```powershell
-copy .env.example .env
+copy .\App\.env.example .\.env
 ```
 
 ### Beispielwerte für `.env`
@@ -128,7 +130,7 @@ MAIL_SUPPRESS_SEND=True
 Erstelle die Tabellen und lege die Standardkonten an:
 
 ```powershell
-python init_db.py
+python .\App\init_db.py
 ```
 
 Standardkonten:
@@ -141,7 +143,7 @@ Wenn du eigene Passwörter verwenden möchtest, setze die Variablen `ADMIN_STAND
 ## 6. Anwendung starten
 
 ```powershell
-python app.py
+python .\App\app.py
 ```
 
 Die Anwendung ist erreichbar unter:
@@ -153,8 +155,8 @@ Die Anwendung ist erreichbar unter:
 Installiere optional `aiosmtpd`, wenn du den lokalen Testserver nutzen möchtest:
 
 ```powershell
-python -m pip install aiosmtpd
-python smtp_server.py
+.\.venv\Scripts\python.exe -m pip install aiosmtpd
+.\.venv\Scripts\python.exe .\App\smtp_server.py
 ```
 
 Für den Testserver sollte deine `.env` enthalten:
@@ -171,10 +173,10 @@ MAIL_SUPPRESS_SEND=False
 Wenn `python` nicht die gewünschte Version verwendet, starte Befehle mit dem vollständigen Pfad:
 
 ```powershell
-C:\Users\Student\AppData\Local\Python\Python310\python.exe -m venv .venv
-C:\Users\Student\AppData\Local\Python\Python310\python.exe -m pip install -r requirements.txt
-C:\Users\Student\AppData\Local\Python\Python310\python.exe init_db.py
-C:\Users\Student\AppData\Local\Python\Python310\python.exe app.py
+C:\Users\Student\AppData\Local\Python\bin\python.exe -m venv .venv
+C:\Users\Student\AppData\Local\Python\bin\python.exe -m pip install -r .\App\requirements.txt
+C:\Users\Student\AppData\Local\Python\bin\python.exe .\App\init_db.py
+C:\Users\Student\AppData\Local\Python\bin\python.exe .\App\app.py
 ```
 
 ## 9. Produktionshinweise

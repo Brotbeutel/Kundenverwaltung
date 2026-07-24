@@ -2,7 +2,8 @@
 # Bootstrap-Skript für Windows, das die normale Python-Installation verwendet und eine virtuelle Umgebung einrichtet.
 
 $scriptRoot = $PSScriptRoot
-Set-Location $scriptRoot
+$projectRoot = Split-Path $scriptRoot -Parent
+Set-Location $projectRoot
 
 $pythonPath = "C:\Users\Student\AppData\Local\Python\bin\python.exe"
 if (-Not (Test-Path $pythonPath)) {
@@ -10,7 +11,7 @@ if (-Not (Test-Path $pythonPath)) {
     exit 1
 }
 
-$venvPath = Join-Path $scriptRoot ".venv"
+$venvPath = Join-Path $projectRoot ".venv"
 $activatePath = Join-Path $venvPath "Scripts\Activate.ps1"
 $pythonInVenv = Join-Path $venvPath "Scripts\python.exe"
 
@@ -26,21 +27,19 @@ else {
     Write-Host "Using existing virtual environment at $venvPath"
 }
 
-Write-Host "Activating virtual environment..."
-. $activatePath
-if ($LASTEXITCODE -ne 0) {
-    Write-Error "Failed to activate virtual environment. Run '. $activatePath' manually."
-    exit $LASTEXITCODE
+if (-Not (Test-Path $activatePath)) {
+    Write-Error "Virtual environment activation script not found: $activatePath"
+    exit 1
 }
 
 Write-Host "Upgrading pip..."
-python -m pip install --upgrade pip
+& $pythonInVenv -m pip install --upgrade pip
 Write-Host "Installing requirements..."
-python -m pip install -r requirements.txt
+& $pythonInVenv -m pip install -r "$scriptRoot\requirements.txt"
 
-if (-Not (Test-Path .env) -and (Test-Path .env.example)) {
-    Copy-Item .env.example .env
+if (-Not (Test-Path "$projectRoot\.env") -and (Test-Path "$scriptRoot\.env.example")) {
+    Copy-Item "$scriptRoot\.env.example" "$projectRoot\.env"
     Write-Host ".env file created from .env.example. Please edit .env before running the app."
 }
 
-Write-Host "Bootstrap complete. Run 'python init_db.py' and then 'python app.py'."
+Write-Host "Bootstrap complete. Run 'python App/init_db.py' and then 'python App/app.py'."

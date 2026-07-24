@@ -35,7 +35,7 @@ Diese Anwendung digitalisiert papierbasierte Kundenlisten und bietet einen zentr
 
 ## Lokale Einrichtung
 
-Die Hauptanwendung befindet sich in `App/`. Ein Einstieg ist in `App/installation_guide.md` dokumentiert.
+Die Hauptanwendung befindet sich in `App/`. Eine ausführliche Windows-Startanleitung befindet sich in `installation_guide.md`.
 
 ### Einfache Windows-Startoption
 
@@ -55,11 +55,11 @@ cd C:\GitHub\Kundenverwaltung
 ### Manueller Start
 
 ```powershell
-cd C:\GitHub\Kundenverwaltung\App
-powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\setup_dev_env.ps1
-.\.venv\Scripts\Activate.ps1
-python init_db.py
-python app.py
+cd C:\GitHub\Kundenverwaltung
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\App\setup_dev_env.ps1
+\.\.venv\Scripts\Activate.ps1
+python .\App\init_db.py
+python .\App\app.py
 ```
 
 Öffne dann `http://127.0.0.1:5000` im Browser.
@@ -75,7 +75,7 @@ python app.py
 
 ## Konfiguration
 
-Die Anwendung lädt Umgebungsvariablen aus einer `.env`-Datei im `App/`-Verzeichnis. Beispielwerte findest du in `App/.env.example`.
+Die Anwendung lädt Umgebungsvariablen aus einer `.env`-Datei im Projektroot. Beispielwerte findest du in `App/.env.example`.
 
 Für Mail-Parameter wie `MAIL_SERVER`, `MAIL_PORT`, `MAIL_USE_TLS`, `MAIL_USERNAME`, `MAIL_PASSWORD`, `MAIL_DEFAULT_SENDER` und `MAIL_SUPPRESS_SEND` wird `App/config.py` verwendet. Standardmäßig ist ein lokaler SMTP-Testserver auf `127.0.0.1:1025` konfiguriert.
 
@@ -83,10 +83,10 @@ Für Mail-Parameter wie `MAIL_SERVER`, `MAIL_PORT`, `MAIL_USE_TLS`, `MAIL_USERNA
 
 1. Installiere den lokalen SMTP-Server:
    ```powershell
-   python -m pip install aiosmtpd
-   python smtp_server.py
+   .\.venv\Scripts\python.exe -m pip install aiosmtpd
+   .\.venv\Scripts\python.exe .\App\smtp_server.py
    ```
-2. Setze in `App/.env`:
+2. Setze in `.env` im Projektroot:
    ```env
    MAIL_SERVER=127.0.0.1
    MAIL_PORT=1025
@@ -104,5 +104,5 @@ Für Mail-Parameter wie `MAIL_SERVER`, `MAIL_PORT`, `MAIL_USE_TLS`, `MAIL_USERNA
 
 ## Weiteres
 
-Siehe `App/installation_guide.md` für eine ausführliche Installations- und Startanleitung.
+Siehe `installation_guide.md` für eine ausführliche Installations- und Startanleitung.
 
