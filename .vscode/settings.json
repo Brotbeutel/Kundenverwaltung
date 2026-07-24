@@ -1,0 +1,6 @@
+{
+  "python.defaultInterpreterPath": "C:\\Users\\Student\\AppData\\Local\\Python\\bin\\python.exe",
+  "python.formatting.provider": "black",
+  "python.analysis.extraPaths": ["App"],
+  "python.envFile": "${workspaceFolder}/App/.env"
+}
